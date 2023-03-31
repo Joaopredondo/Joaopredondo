@@ -27,4 +27,12 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
   <img align="center" alt="Joao-CSS" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">
   <img align="right" alt="Joao-pic" height="150" style="border-radius:50px;" src="https://avatars.githubusercontent.com/u/81270910?s=400&u=f1d2e150f2a4b14ca548e0035eaa8afc9ed746d8&v=4">
 </div>
+  
+   ##
+  
+<div> 
+  <a href="https://instagram.com/jp_redondo" target="_blank"><img src="https://img.shields.io/badge/-Instagram-%23E4405F?style=for-the-badge&logo=instagram&logoColor=white" target="_blank"></a>
+  <a href = "mailto:joaopedroredondo@hotmail.com"><img src="https://img.shields.io/badge/-Gmail-%23333?style=for-the-badge&logo=gmail&logoColor=white" target="_blank"></a>
+  <a href="https://www.linkedin.com/in/https://www.linkedin.com/in/joaopedroredondo/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"></a> 
+</div>
     
