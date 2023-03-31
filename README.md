@@ -15,6 +15,6 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
 <div>
   <a href="https://github.com/Joaopredondo">
   <img height="180em" src="https://github-readme-stats.vercel.app/api?username=Joaopredondo&show_icons=true&theme=dracula"/>
-  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Joaopredondo)](https://github.com/anuraghazra/github-readme-stats"/>
+  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Joaopredondo"/>
        
 </div>                           
