@@ -25,6 +25,6 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
   <img align="center" alt="Joao-React" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg">
   <img align="center" alt="Joao-HTML" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">
   <img align="center" alt="Joao-CSS" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">
-  <img align="right" alt="Joao-pic" height="150" style="border-radius:50px;
+  <img align="right" alt="Joao-pic" height="150" style="border-radius:50px;" src="https://avatars.githubusercontent.com/u/81270910?s=400&u=f1d2e150f2a4b14ca548e0035eaa8afc9ed746d8&v=4">
 </div>
     
