@@ -12,8 +12,6 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
 - 🔗 Linkedln: https://www.linkedin.com/in/joaopedroredondo/
 - 😄 Pronouns: ele/dele
 
-[![Status](https://github-readme-stats.vercel.app/api?username=Joaopredondo)](https://github.com/Joaopredondo/Joaopredondo)
-![Status](https://github-readme-stats.vercel.app/api?username=Joaopredondo&hide=contribs,prs)
 ![Private Status](https://github-readme-stats.vercel.app/api?username=Joaopredondo&count_private=true)
 ![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=Joaopredondo&show_icons=true)
 ![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=Joaopredondo&show_icons=true&theme=radical)
