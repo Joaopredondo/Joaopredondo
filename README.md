@@ -36,5 +36,5 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
   <a href="https://www.linkedin.com/in/joaopedroredondo/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"></a> 
 </div>
 
-![snake gif](https://github.com/Joaopredondo/Joaopredondo/blob/output/github-contribution-grid-snake.gif)
+[![An image of @joaoredondo's Holopin badges, which is a link to view their full Holopin profile](https://holopin.me/joaoredondo)](https://holopin.io/@joaoredondo)
     
