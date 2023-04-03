@@ -30,9 +30,8 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
   
    ##
   
-  <div>
   [![An image of @joaoredondo's Holopin badges, which is a link to view their full Holopin profile](https://holopin.me/joaoredondo)](https://holopin.io/@joaoredondo)
-  </div>
+ 
   
 <div> 
   <a href="https://instagram.com/jp_redondo" target="_blank"><img src="https://img.shields.io/badge/-Instagram-%23E4405F?style=for-the-badge&logo=instagram&logoColor=white" target="_blank"></a>
