@@ -8,7 +8,7 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
 
 - 🔭 Hoje estou atuando como full Stack
 - 🌱 Atualmente estou me aprofundando no Back-End com java
-- 📫 Contato email: mailto:joaopedroredondo@hotmail.com
+- 📫 Contato email: joaopedroredondo@hotmail.com
 - 🔗 Linkedln: https://www.linkedin.com/in/joaopedroredondo/
 - 😄 Pronouns: ele/dele
 
