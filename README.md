@@ -36,5 +36,8 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
   <a href="https://www.linkedin.com/in/joaopedroredondo/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"></a> 
   </div>
   
+  ##
+  <img align='center' src="https://www.codewars.com/users/Joaopredondo/badges/micro"
+  
    [![An image of @joaoredondo's Holopin badges, which is a link to view their full Holopin profile](https://holopin.me/joaoredondo)](https://holopin.io/@joaoredondo)
     
