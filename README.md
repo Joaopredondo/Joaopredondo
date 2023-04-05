@@ -37,7 +37,7 @@ Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui 
   </div>
   
   ##
-  <img align='center' src="https://www.codewars.com/users/Joaopredondo/badges/micro"
+  <a align='center' src="https://www.codewars.com/users/Joaopredondo/badges/micro"></a>
   
    [![An image of @joaoredondo's Holopin badges, which is a link to view their full Holopin profile](https://holopin.me/joaoredondo)](https://holopin.io/@joaoredondo)
     
