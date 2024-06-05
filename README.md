@@ -4,7 +4,7 @@ Trabalhei ate 2021 em uma empresa de Comercio de Bicicletas, convivendo tanto co
 
 No inicio de 2021 iniciei a faculdade de Engenharia de Software na Unicesumar devido a ser um amante e entusiasta da tecnologia. 
 
-Recentemente trabalhei na DB1 Group com desenvolvedor Full Stack, onde consegui apreender sobre novas tecnologias e aperfeiçoar o que já conhecia. Estou sempre a procura de novos desafios e conquistas, essa é minha essência.
+Recentemente trabalhei na DB1 Group como desenvolvedor Full Stack, onde consegui apreender sobre novas tecnologias e aperfeiçoar o que já conhecia. Estou sempre a procura de novos desafios e conquistas, essa é minha essência.
 
 Atualmente estou trabalhando na Cocari como Desenvolvedor.
 
