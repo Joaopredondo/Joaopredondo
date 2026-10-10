@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 190" width="580" height="190" role="img" aria-label="Lume">
+  <style>
+    .sans { font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Helvetica, Arial, sans-serif; }
+    .dot { animation: pulse 2.4s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: .35; } }
+    @media (prefers-reduced-motion: reduce) { .dot { animation: none; } }
+  </style>
+  <rect x=".5" y=".5" width="579" height="189" rx="14" fill="#0f1a2e" stroke="#1f3350"/>
+  <rect x="28" y="0" width="56" height="3" rx="1.5" fill="#4fd1c5"/>
+  <circle class="dot" cx="34" cy="42" r="5" fill="#4fd1c5"/>
+  <text class="sans" x="50" y="48" fill="#f3f6fb" font-size="21" font-weight="700">Lume</text>
+  <text class="sans" x="552" y="47" fill="#9fb0c8" font-size="12" font-weight="600" letter-spacing="1.5" text-anchor="end">WEB APP</text>
+  <text class="sans" x="28" y="84" fill="#9fb0c8" font-size="14.5">Estimulação visual e cognitiva para baixa visão extrema,</text><text class="sans" x="28" y="106" fill="#9fb0c8" font-size="14.5">usada por cuidador ou terapeuta em ambiente escuro.</text><text class="sans" x="28" y="128" fill="#9fb0c8" font-size="14.5">Funciona offline, sem backend e sem conta.</text>
+  <text class="sans" x="28" y="164" fill="#4fd1c5" font-size="13" font-weight="600">React · TypeScript · Vitest · Playwright · PWA</text>
+</svg>
