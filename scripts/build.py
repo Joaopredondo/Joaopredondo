@@ -262,10 +262,12 @@ def controls(svg, t, s, which):
 
 
 # A base do console é cortada em quatro imagens para os botões virarem links. Os cortes ficam em
-# múltiplos de 20 px para que, no celular (escala 0,6), todas as peças tenham largura inteira.
+# múltiplos de 20 px para que, no celular (escala 0,45), todas as peças tenham largura inteira.
+# No celular o README tem só ~293 px úteis em telas de 375 px e ~278 px em telas de 360 px, então o
+# console inteiro (560 x 0,45 = 252 px) precisa caber nisso para as peças não quebrarem de linha.
 STRIP = {"p1": (0, 160, {"dpad"}), "p2": (160, 360, {"pills"}), "p3": (360, 440, {"email"}),
          "p4": (440, 560, {"linkedin"})}
-MOBILE = 0.6  # escala do console no celular: 560 px viram 336 px
+MOBILE = 0.45  # escala do console no celular: 560 px viram 252 px
 
 
 def strip(theme, piece, nrows=4, scale=1):
