@@ -35,17 +35,23 @@
 
 <table>
 <tr>
-<td width="50%" valign="top">
-<img src="./media/prancha-kids.webp" width="104" align="right" alt="Prancha Kids no celular, com a grade de figuras e bordas coloridas por categoria">
+<td width="140" align="center" valign="top">
+<img src="./media/prancha-kids.webp" width="104" alt="Prancha Kids no celular, com a grade de figuras e bordas coloridas por categoria">
+</td>
+<td valign="top">
 <b>Prancha Kids</b><br>
-Prancha de comunicação alternativa para crianças. A criança toca na figura e o celular fala a palavra. 42 figuras, funciona offline.<br><br>
+Prancha de comunicação alternativa para crianças. A criança toca na figura e o celular fala a palavra. São 42 figuras, com vocabulário do dia a dia e da igreja. A posição de cada figura nunca muda, porque a criança memoriza onde cada uma fica. Instala na tela inicial e funciona offline.<br><br>
 <sub>React · TypeScript · PWA</sub><br>
 <a href="https://prancha-kids.vercel.app">Abrir o app</a> · <a href="https://github.com/Joaopredondo/prancha-kids">Código</a>
 </td>
-<td width="50%" valign="top">
-<img src="./media/lume.webp" width="104" align="right" alt="Tela inicial do Lume no celular, em fundo preto">
+</tr>
+<tr>
+<td width="140" align="center" valign="top">
+<img src="./media/lume.webp" width="104" alt="Tela inicial do Lume no celular, em fundo preto">
+</td>
+<td valign="top">
 <b>Lume</b><br>
-Estimulação visual e cognitiva para baixa visão extrema, usada em ambiente escuro por um cuidador ou terapeuta. Offline, sem conta.<br><br>
+Estimulação visual e cognitiva para baixa visão extrema, usada em ambiente escuro por um cuidador ou terapeuta com a pessoa atendida. Apresenta o estímulo calibrado e registra a resposta. Funciona offline, sem backend e sem conta. Não é dispositivo médico.<br><br>
 <sub>React · TypeScript · Vitest · Playwright</sub><br>
 <a href="https://lume-one-xi.vercel.app">Abrir o app</a> · <a href="https://github.com/Joaopredondo/lume">Código</a>
 </td>
