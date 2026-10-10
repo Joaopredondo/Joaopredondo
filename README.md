@@ -1,46 +1,55 @@
-## Olá!! Eu sou o João Pedro 👋
+<div align="center">
+  <img src="./assets/header.svg" width="100%" alt="João Pedro Redondo — Desenvolvedor Java · Back-End e Full Stack" />
+</div>
 
-Desenvolvedor Java com mais de 4 anos de experiência em back-end e full stack. Trabalho com Java e Spring, APIs REST, microsserviços, PostgreSQL e Oracle; no front-end, Angular e React com TypeScript.
+<p align="center">
+  <a href="https://www.linkedin.com/in/joaopedroredondo/"><img src="https://img.shields.io/badge/LinkedIn-0b1220?style=for-the-badge&logo=linkedin&logoColor=4fd1c5" alt="LinkedIn" /></a>
+  <a href="mailto:joaopedroredondo@hotmail.com"><img src="https://img.shields.io/badge/E--mail-0b1220?style=for-the-badge&logo=gmail&logoColor=4fd1c5" alt="E-mail" /></a>
+  <a href="https://instagram.com/jp_redondo"><img src="https://img.shields.io/badge/Instagram-0b1220?style=for-the-badge&logo=instagram&logoColor=4fd1c5" alt="Instagram" /></a>
+</p>
 
-Hoje sou Java Software Developer na Sabium Sistemas. Antes, fui desenvolvedor back-end na COCARI e desenvolvedor full stack na DB1 Group, onde atuei no Predize, um hub de mensageria que integra Mercado Livre, Amazon, Americanas e Via Varejo.
+## Sobre mim
+
+Desenvolvedor Java com mais de 4 anos de experiência em back-end e full stack. Hoje desenvolvo o ERP da **Sabium Sistemas**, usado por mais de 1.500 clientes.
+
+Antes disso, fui desenvolvedor back-end na **COCARI** e full stack na **DB1 Group**, onde atuei no Predize, um hub de mensageria que integra Mercado Livre, Amazon, Americanas e Via Varejo.
 
 Antes de programar, passei 7 anos no comércio físico e no e-commerce. Isso me ajuda a entender a regra de negócio, e não só o código.
 
-- 🔭 Hoje atuo como full stack, com foco em Java no back-end
-- 🧩 Projetos pessoais em destaque: [Prancha Kids](https://github.com/Joaopredondo/prancha-kids) (comunicação alternativa para crianças) e [Lume](https://github.com/Joaopredondo/lume) (estimulação visual para baixa visão)
-- 🎓 Bacharel em Engenharia de Software pela UniCesumar
-- 📫 Contato email: joaopedroredondo@hotmail.com
-- 🔗 LinkedIn: https://www.linkedin.com/in/joaopedroredondo/
-- 😄 Pronouns: ele/dele
+## Stack
 
-<div>
-  <a href="https://github.com/Joaopredondo">
-  <img height="180em" src="https://github-readme-stats.vercel.app/api?username=Joaopredondo&show_icons=true&hide_border=true&theme=dracula"/> 
-  <img height="180em" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Joaopredondo&layout=compact&hide_border=true&theme=dracula"/> 
-</div>
-  
-<div style="display: inline_block"><br>
-  <img align="center" alt="Joao-Java" height="30" width="40" src="https://github.com/devicons/devicon/blob/master/icons/java/java-original.svg">
-  <img align="center" alt="Joao-Spring" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/spring/spring-original.svg">
-  <img align="center" alt="Joao-PostgreSQL" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg">
-  <img align="center" alt="Joao-Oracle" height="30" width="40" src="https://github.com/devicons/devicon/blob/master/icons/oracle/oracle-original.svg">
-  <img align="center" alt="Joao-Docker" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original.svg">
-  <img align="center" alt="Joao-Js" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-plain.svg">
-  <img align="center" alt="Joao-Ts" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-plain.svg">
-  <img align="center" alt="Joao-Angular" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/angular/angular-original.svg">
-  <img align="center" alt="Joao-React" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg">
-  <img align="center" alt="Joao-HTML" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/html5/html5-original.svg">
-  <img align="center" alt="Joao-CSS" height="30" width="40" src="https://raw.githubusercontent.com/devicons/devicon/master/icons/css3/css3-original.svg">
-</div>
-  
-   ##
-<div>
-  <p></p>
-  <a href="https://instagram.com/jp_redondo" target="_blank"><img src="https://img.shields.io/badge/-Instagram-%23E4405F?style=for-the-badge&logo=instagram&logoColor=white" target="_blank"></a>
-  <a href = "mailto:joaopedroredondo@hotmail.com"><img src="https://img.shields.io/badge/Microsoft_Outlook-0078D4?style=for-the-badge&logo=microsoft-outlook&logoColor=white" target="_blank"></a>
-  <a href="https://www.linkedin.com/in/joaopedroredondo/" target="_blank"><img src="https://img.shields.io/badge/-LinkedIn-%230077B5?style=for-the-badge&logo=linkedin&logoColor=white" target="_blank"></a> 
-  </div>
- <br>
-  <img src = "https://www.codewars.com/users/Joaopredondo/badges/large">
-  
-   [![An image of @joaoredondo's Holopin badges, which is a link to view their full Holopin profile](https://holopin.me/joaoredondo)](https://holopin.io/@joaoredondo)
+<p>
+  <img src="https://skillicons.dev/icons?i=java,spring,postgres,docker,git,maven&theme=dark" alt="Java, Spring, PostgreSQL, Docker, Git, Maven" />
+</p>
+<p>
+  <img src="https://skillicons.dev/icons?i=angular,react,ts,js,html,css&theme=dark" alt="Angular, React, TypeScript, JavaScript, HTML, CSS" />
+</p>
+
+## Projetos em destaque
+
+<p>
+  <a href="https://github.com/Joaopredondo/prancha-kids"><img src="./assets/card-prancha-kids.svg" width="49%" alt="Prancha Kids — prancha de comunicação alternativa (CAA) para crianças" /></a>
+  <a href="https://github.com/Joaopredondo/lume"><img src="./assets/card-lume.svg" width="49%" alt="Lume — estimulação visual e cognitiva para baixa visão extrema" /></a>
+</p>
+<p>
+  <a href="https://github.com/Joaopredondo/BigChatBrasil"><img src="./assets/card-bigchat.svg" width="49%" alt="Big Chat Brasil — envio de mensagens SMS e WhatsApp com Java, Spring Boot e React" /></a>
+  <a href="https://github.com/Joaopredondo/BookTrack"><img src="./assets/card-booktrack.svg" width="49%" alt="BookTrack — gestão de biblioteca em Java com Spring Boot" /></a>
+</p>
+
+## GitHub em números
+
+<p>
+  <img height="170" src="https://github-readme-stats.vercel.app/api?username=Joaopredondo&show_icons=true&hide_border=true&bg_color=0b1220&title_color=4fd1c5&text_color=c9d5e6&icon_color=4fd1c5" alt="Estatísticas do GitHub" />
+  <img height="170" src="https://github-readme-stats.vercel.app/api/top-langs/?username=Joaopredondo&layout=compact&hide_border=true&bg_color=0b1220&title_color=4fd1c5&text_color=c9d5e6" alt="Linguagens mais usadas" />
+</p>
+<p>
+  <img src="https://streak-stats.demolab.com/?user=Joaopredondo&hide_border=true&background=0b1220&ring=4fd1c5&fire=4fd1c5&currStreakLabel=4fd1c5&currStreakNum=f3f6fb&sideNums=f3f6fb&sideLabels=9fb0c8&dates=9fb0c8&stroke=1f3350" alt="Sequência de contribuições" />
+</p>
+
+## Mais
+
+<p>
+  <img src="https://www.codewars.com/users/Joaopredondo/badges/large" alt="Codewars" />
+</p>
+
+[![Badges do Holopin de @joaoredondo](https://holopin.me/joaoredondo)](https://holopin.io/@joaoredondo)
