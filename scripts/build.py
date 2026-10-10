@@ -1,11 +1,12 @@
-"""Gera os SVGs do README (aparelho, inventário e títulos) a partir de dados públicos do GitHub.
+"""Gera os SVGs do README (aparelho, inventário, títulos e selos) a partir de dados públicos do GitHub.
 
 Uso: python scripts/build.py
 Só usa a biblioteca padrão. Com GITHUB_TOKEN no ambiente, as chamadas à API usam o token.
 
 O GitHub não carrega fontes dentro de SVG, então o texto é desenhado com os contornos da fonte
 Silkscreen (licença OFL, ver OFL-Silkscreen.txt), guardados em glyphs.json. Os ícones, em
-icons.json, vêm do Simple Icons (CC0).
+icons.json, vêm do Simple Icons (CC0). A fonte tem pixel de 1/8 do corpo: use corpos múltiplos de 8
+(16, 24, 32) para as bordas ficarem nítidas.
 """
 import datetime
 import json
@@ -20,22 +21,27 @@ OUT = os.path.join(os.path.dirname(HERE), "media")
 GLYPHS = json.load(open(os.path.join(HERE, "glyphs.json"), encoding="utf-8"))
 ICONS = json.load(open(os.path.join(HERE, "icons.json"), encoding="utf-8"))
 
+WIDTH = 560  # largura única de todos os blocos do README
+
 THEMES = {
     "dark": {
         "shell": "#d9d3c4", "edge": "#b9b3a3", "shell_ink": "#5a564b", "bezel": "#2b2d34", "btn": "#c9473e",
-        "accent": "#e8734a", "card": "#151a21", "card_edge": "#30363d", "ink": "#f0f6fc",
+        "accent": "#58a6ff", "on_accent": "#0d1117", "card": "#151a21", "card_edge": "#30363d", "ink": "#f0f6fc",
     },
     "light": {
         "shell": "#ebe6d8", "edge": "#cdc7b4", "shell_ink": "#6a665b", "bezel": "#2b2d34", "btn": "#c9473e",
-        "accent": "#b8461f", "card": "#f6f8fa", "card_edge": "#d0d7de", "ink": "#1f2328",
+        "accent": "#0b5fd0", "on_accent": "#ffffff", "card": "#f6f8fa", "card_edge": "#d0d7de", "ink": "#1f2328",
     },
 }
 LCD = {"bg": "#b9c99c", "dim": "#9fb182", "edge": "#8a9c70", "ink": "#222c1b",
        "ramp": ["#aebf90", "#93a676", "#70865a", "#4a5e3a", "#222c1b"]}
 
-INVENTORY = [("JAVA", "java"), ("SPRING", "spring"), ("POSTGRES", "postgres"), ("ORACLE", "oracle"),
+INVENTORY = [("JAVA", "java"), ("SPRING", "spring"), ("PGSQL", "postgres"), ("ORACLE", "oracle"),
              ("DOCKER", "docker"), ("JS", "js"), ("TS", "ts"), ("ANGULAR", "angular"),
              ("REACT", "react"), ("HTML", "html"), ("CSS", "css"), ("GIT", "git")]
+PERIODS = {"1": "2025 - HOJE", "2": "2023 - 2025", "3": "2022 - 2023"}
+CARTRIDGES = {"prancha": "PRANCHA KIDS", "lume": "LUME"}
+SECTIONS = {"sobre": "SOBRE MIM", "inventario": "INVENTÁRIO", "cartuchos": "CARTUCHOS", "historico": "HISTÓRICO"}
 
 
 def fetch(url, accept="application/vnd.github+json", data=None):
@@ -91,12 +97,6 @@ def totals():
         except Exception:
             pass
     return out
-
-
-def mix(a, b, t):
-    pa = [int(a[i:i + 2], 16) for i in (1, 3, 5)]
-    pb = [int(b[i:i + 2], 16) for i in (1, 3, 5)]
-    return "#" + "".join("%02x" % round(x + (y - x) * t) for x, y in zip(pa, pb))
 
 
 class Svg:
@@ -159,28 +159,27 @@ def calendar_columns(days):
     return cols[-53:]
 
 
-def blink(opacity_values="1;0", dur="1.1s"):
-    return (f'<animate attributeName="opacity" values="{opacity_values}" keyTimes="0;0.5" dur="{dur}" '
+def blink(dur="1.1s"):
+    return (f'<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" dur="{dur}" '
             f'calcMode="discrete" repeatCount="indefinite"/>')
 
 
-def snake(svg, ncols, lcd, left, top, pitch=11, size=9, length=4, dur=14):
+def snake(svg, ncols, left, top, pitch=8, size=6, length=4, dur=14):
     """Cobrinha em passos discretos, em zigue-zague, atravessando a grade da esquerda para a direita."""
     def pos(i):
         r = i % 12
         return i * pitch, (r if r <= 6 else 12 - r) * pitch
-    steps = ncols
     clip = f"clip{left}"
     svg.add(f'<clipPath id="{clip}"><rect x="{left}" y="{top}" width="{ncols * pitch - 2}" height="{7 * pitch - 2}"/></clipPath>')
     svg.add(f'<g clip-path="url(#{clip})">')
     for k in range(length):
         values = []
-        for i in range(steps):
+        for i in range(ncols):
             j = i - k
             x, y = pos(j) if j >= 0 else (-pitch * 2, 0)
             values.append(f"{left + x:g} {top + y:g}")
-        key = ";".join(f"{i / steps:.4f}" for i in range(steps))
-        svg.add(f'<rect width="{size}" height="{size}" fill="{lcd["ink"]}" stroke="{lcd["bg"]}" stroke-width="1">'
+        key = ";".join(f"{i / ncols:.4f}" for i in range(ncols))
+        svg.add(f'<rect width="{size}" height="{size}" fill="{LCD["ink"]}" stroke="{LCD["bg"]}" stroke-width="1">'
                 f'<animateTransform attributeName="transform" type="translate" values="{";".join(values)}" '
                 f'keyTimes="{key}" dur="{dur}s" calcMode="discrete" repeatCount="indefinite"/></rect>')
     svg.add("</g>")
@@ -188,98 +187,115 @@ def snake(svg, ncols, lcd, left, top, pitch=11, size=9, length=4, dur=14):
 
 def device(theme, data):
     t = THEMES[theme]
-    W, H = 760, 866
+    W, H = WIDTH, 670
     svg = Svg(W, H, "Console portátil com os números do perfil, a cobrinha sobre o calendário e as linguagens")
     # carcaça com sombra embaixo
     for dy, fill in ((6, t["edge"]), (0, t["shell"])):
-        svg.add(f'<path d="M28 {dy}H732a28 28 0 0 1 28 28V{796 + dy}a64 64 0 0 1-64 64H28a28 28 0 0 1-28-28V{28 + dy}A28 28 0 0 1 28 {dy}Z" '
+        svg.add(f'<path d="M24 {dy}H536a24 24 0 0 1 24 24V{616 + dy}a48 48 0 0 1-48 48H24a24 24 0 0 1-24-24V{24 + dy}A24 24 0 0 1 24 {dy}Z" '
                 f'fill="{fill}"/>')
-    svg.text(40, 52, "JPR-1 · DEV HANDHELD", 16, t["shell_ink"], track=1)
-    svg.text(720, 52, "MARINGÁ · PR", 16, t["shell_ink"], anchor="end", track=1)
+    svg.text(28, 40, "JPR-1 · DEV HANDHELD", 16, t["shell_ink"])
+    svg.text(532, 40, "MARINGÁ · PR", 16, t["shell_ink"], anchor="end")
 
     # tela de cima
-    svg.rect(40, 72, 680, 284, t["bezel"], 14)
-    svg.rect(62, 94, 636, 240, LCD["bg"], extra=f'stroke="{LCD["edge"]}" stroke-width="2"')
-    svg.text(86, 128, "JOGADOR 1", 16, LCD["ink"], extra='opacity=".7"')
-    svg.text(86, 176, "JOÃO PEDRO", 32, LCD["ink"], "B")
-    svg.text(86, 220, "REDONDO", 32, LCD["ink"], "B")
-    svg.text(86, 268, "CLASSE · DESENVOLVEDOR JAVA", 16, LCD["ink"])
-    svg.text(86, 292, "SUBCLASSE · FULL STACK", 16, LCD["ink"])
-    svg.add(f'<g>{blink()}<path d="M86 306h4v4h4v4h4v4h-4v4h-4v4h-4z" fill="{LCD["ink"]}"/></g>')
-    svg.add(f'<g>{blink()}')
-    svg.text(106, 320, "PRESS START", 16, LCD["ink"], "B")
+    svg.rect(28, 56, 504, 192, t["bezel"], 12)
+    svg.rect(44, 72, 472, 160, LCD["bg"], extra=f'stroke="{LCD["edge"]}" stroke-width="2"')
+    svg.text(64, 98, "JOGADOR 1", 16, LCD["ink"], extra='opacity=".7"')
+    svg.text(64, 128, "JOÃO PEDRO", 24, LCD["ink"], "B")
+    svg.text(64, 156, "REDONDO", 24, LCD["ink"], "B")
+    svg.text(64, 180, "CLASSE · DEV JAVA", 16, LCD["ink"])
+    svg.text(64, 198, "SUB · FULL STACK", 16, LCD["ink"])
+    svg.add(f'<g>{blink()}<path d="M64 208h3v3h3v3h3v3h-3v3h-3v3h-3z" fill="{LCD["ink"]}"/>')
+    svg.text(80, 222, "PRESS START", 16, LCD["ink"], "B")
     svg.add("</g>")
     stats = [("CONTRIB.", data["contrib"]), ("COMMITS", data["commits"]),
              ("PULL REQ.", data["prs"]), ("REPOS", data["repos"])]
     stats = [(label, v) for label, v in stats if v is not None]
     peak = max(v for _, v in stats) or 1
+    bx, bw = 336, 160
     for i, (label, value) in enumerate(stats):
-        y = 124 + i * 52
-        svg.text(470, y, label, 16, LCD["ink"])
-        svg.text(674, y, str(value), 16, LCD["ink"], anchor="end")
-        svg.rect(470, y + 12, 204, 10, LCD["dim"])
-        w = max(round(204 * value / peak), 4 if value else 0)
+        y = 98 + i * 34
+        svg.text(bx, y, label, 16, LCD["ink"])
+        svg.text(bx + bw, y, str(value), 16, LCD["ink"], anchor="end")
+        svg.rect(bx, y + 7, bw, 8, LCD["dim"])
+        w = max(round(bw * value / peak), 4 if value else 0)
         vals = ";".join(f"{round(w * s / 12)}" for s in range(13))
         keys = ";".join(f"{s / 12:.4f}" for s in range(13))
-        svg.add(f'<rect x="470" y="{y + 12}" width="{w}" height="10" fill="{LCD["ink"]}">'
+        svg.add(f'<rect x="{bx}" y="{y + 7}" width="{w}" height="8" fill="{LCD["ink"]}">'
                 f'<animate attributeName="width" values="{vals}" keyTimes="{keys}" dur="1.4s" '
                 f'calcMode="discrete" begin="{i * 0.15:g}s" fill="freeze"/></rect>')
 
-    svg.rect(40, 366, 680, 6, t["edge"], 3)
+    svg.rect(28, 258, 504, 5, t["edge"], 2)
 
     # tela de baixo
-    svg.rect(40, 384, 680, 328, t["bezel"], 14)
-    svg.rect(62, 406, 636, 284, LCD["bg"], extra=f'stroke="{LCD["edge"]}" stroke-width="2"')
-    svg.text(86, 442, "SNAKE · 12 MESES", 16, LCD["ink"])
-    svg.text(674, 442, f"PONTOS {data['contrib']}", 16, LCD["ink"], anchor="end")
+    svg.rect(28, 273, 504, 252, t["bezel"], 12)
+    svg.rect(44, 289, 472, 220, LCD["bg"], extra=f'stroke="{LCD["edge"]}" stroke-width="2"')
+    svg.text(64, 317, "SNAKE · 12 MESES", 16, LCD["ink"])
+    svg.text(496, 317, f"PONTOS {data['contrib']}", 16, LCD["ink"], anchor="end")
     cols = data["cols"]
-    gx, gy = 86, 458
+    gx, gy = 64, 329
     for ci, col in enumerate(cols):
         for ri, lv in enumerate(col):
-            svg.rect(gx + ci * 11, gy + ri * 11, 9, 9, LCD["ramp"][lv])
-    snake(svg, len(cols), LCD, gx, gy)
-    svg.rect(86, 554, 588, 2, LCD["ink"])
+            svg.rect(gx + ci * 8, gy + ri * 8, 6, 6, LCD["ramp"][lv])
+    snake(svg, len(cols), gx, gy)
+    svg.rect(64, 397, 432, 2, LCD["ink"])
     for i, (name, count) in enumerate(data["langs"][:4]):
-        y = 584 + i * 26
-        svg.text(86, y, name.upper(), 16, LCD["ink"])
-        n = min(count, 16)
+        y = 425 + i * 22
+        svg.text(64, y, name.upper(), 16, LCD["ink"])
+        n = min(count, 14)
         for b in range(n):
-            svg.rect(214 + b * 12, y - 14, 8, 14, LCD["ink"])
-        svg.text(214 + n * 12 + 8, y, str(count), 16, LCD["ink"])
+            svg.rect(196 + b * 9, y - 12, 6, 12, LCD["ink"])
+        svg.text(196 + n * 9 + 6, y, str(count), 16, LCD["ink"])
 
     # comandos
-    svg.add(f'<rect x="72" y="742" width="32" height="96" rx="6" fill="{t["bezel"]}"/>')
-    svg.add(f'<rect x="40" y="774" width="96" height="32" rx="6" fill="{t["bezel"]}"/>')
-    for cx in (350, 420):
-        svg.add(f'<rect x="{cx - 28}" y="793" width="56" height="14" rx="7" fill="{t["edge"]}" transform="rotate(-20 {cx} 800)"/>')
-    for cx, cy, label in ((604, 800, "E-MAIL"), (690, 770, "LINKEDIN")):
-        svg.add(f'<circle cx="{cx}" cy="{cy + 3}" r="26" fill="#000" opacity=".22"/>')
-        svg.add(f'<circle cx="{cx}" cy="{cy}" r="26" fill="{t["btn"]}"/>')
-        svg.text(cx, cy + 48, label, 16, t["shell_ink"], anchor="middle", track=1)
+    svg.add(f'<rect x="56" y="547" width="28" height="78" rx="5" fill="{t["bezel"]}"/>')
+    svg.add(f'<rect x="31" y="572" width="78" height="28" rx="5" fill="{t["bezel"]}"/>')
+    for cx in (262, 326):
+        svg.add(f'<rect x="{cx - 24}" y="591" width="48" height="12" rx="6" fill="{t["edge"]}" transform="rotate(-20 {cx} 597)"/>')
+    for cx, cy, label in ((418, 600, "E-MAIL"), (494, 574, "LINKEDIN")):
+        svg.add(f'<circle cx="{cx}" cy="{cy + 3}" r="22" fill="#000" opacity=".22"/>')
+        svg.add(f'<circle cx="{cx}" cy="{cy}" r="22" fill="{t["btn"]}"/>')
+        svg.text(cx, cy + 42, label, 16, t["shell_ink"], anchor="middle")
     return svg.render()
 
 
 def inventory(theme):
     t = THEMES[theme]
-    svg = Svg(760, 242, "Tecnologias com as quais trabalho")
-    slot, gap = 112, 17.6
+    slot, gap = 90, 4
+    rows = (len(INVENTORY) + 5) // 6
+    svg = Svg(WIDTH, rows * slot + (rows - 1) * gap, "Tecnologias com as quais trabalho")
     for i, (label, key) in enumerate(INVENTORY):
         x = (i % 6) * (slot + gap)
         y = (i // 6) * (slot + gap)
-        svg.add(f'<rect x="{x + 1:.1f}" y="{y + 1:.1f}" width="{slot - 2}" height="{slot - 2}" fill="{t["card"]}" '
+        assert svg.measure(label, 16) <= slot - 4, label
+        svg.add(f'<rect x="{x + 1}" y="{y + 1}" width="{slot - 2}" height="{slot - 2}" fill="{t["card"]}" '
                 f'stroke="{t["card_edge"]}" stroke-width="2"/>')
-        svg.add(f'<path transform="translate({x + slot / 2 - 20:.1f} {y + 24:.1f}) scale({40 / 24:.4f})" '
+        svg.add(f'<path transform="translate({x + slot / 2 - 16:g} {y + 14}) scale({32 / 24:.4f})" '
                 f'fill="{t["ink"]}" d="{ICONS[key]}"/>')
-        svg.text(x + slot / 2, y + 96, label, 16, t["ink"], anchor="middle")
+        svg.text(x + slot / 2, y + 70, label, 16, t["ink"], anchor="middle")
     return svg.render()
 
 
-def title(theme, label):
+def title(theme, label, size=24, width=WIDTH):
+    """Título em pixel, na cor de destaque, seguido de uma linha tracejada até a borda."""
     t = THEMES[theme]
-    probe = Svg(0, 0, "")
-    width = round(probe.measure(label, 24, "B", 2)) + 2
-    svg = Svg(width, 28, label)
-    svg.text(0, 22, label, 24, t["accent"], "B", track=2)
+    svg = Svg(width, size + 8, label)
+    end = svg.measure(label, size, "B")
+    svg.text(0, size, label, size, t["accent"], "B")
+    cap = size * 0.625
+    x = end + 16
+    while x + 6 <= width:
+        svg.rect(round(x), round(size - cap / 2 - 1), 6, 2, t["accent"], extra='opacity=".45"')
+        x += 10
+    return svg.render()
+
+
+def badge(theme, label):
+    """Selo de período, com borda azul."""
+    t = THEMES[theme]
+    w = round(Svg(0, 0, "").measure(label, 16)) + 28
+    svg = Svg(w, 30, label)
+    svg.add(f'<rect x="1" y="1" width="{w - 2}" height="28" fill="none" stroke="{t["accent"]}" stroke-width="2"/>')
+    svg.text(w / 2, 20, label, 16, t["ink"], anchor="middle")
     return svg.render()
 
 
@@ -290,11 +306,14 @@ def main():
     data = {"contrib": sum(n for _, n in days), "commits": extra["commits"], "prs": extra["prs"],
             "repos": extra["repos"], "cols": calendar_columns(days), "langs": langs}
     os.makedirs(OUT, exist_ok=True)
-    titles = {"sobre": "SOBRE MIM", "inventario": "INVENTÁRIO", "cartuchos": "CARTUCHOS", "historico": "HISTÓRICO"}
     for theme in THEMES:
         files = {f"device-{theme}.svg": device(theme, data), f"inventory-{theme}.svg": inventory(theme)}
-        for key, label in titles.items():
+        for key, label in SECTIONS.items():
             files[f"h-{key}-{theme}.svg"] = title(theme, label)
+        for key, label in CARTRIDGES.items():
+            files[f"c-{key}-{theme}.svg"] = title(theme, label, size=16, width=400)
+        for key, label in PERIODS.items():
+            files[f"b-{key}-{theme}.svg"] = badge(theme, label)
         for name, content in files.items():
             with open(os.path.join(OUT, name), "w", encoding="utf-8", newline="\n") as f:
                 f.write(content)
