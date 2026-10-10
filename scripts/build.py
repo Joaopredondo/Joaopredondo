@@ -34,7 +34,7 @@ THEMES = {
     },
 }
 LCD = {"bg": "#b9c99c", "dim": "#9fb182", "edge": "#8a9c70", "ink": "#222c1b",
-       "ramp": ["#aebf90", "#93a676", "#70865a", "#4a5e3a", "#222c1b"]}
+       "shades": ["#4a5e3a", "#5f754a", "#7a8f5f", "#93a676"]}
 
 INVENTORY = [("JAVA", "java"), ("SPRING", "spring"), ("PGSQL", "postgres"), ("ORACLE", "oracle"),
              ("DOCKER", "docker"), ("JS", "js"), ("TS", "ts"), ("ANGULAR", "angular"),
@@ -42,6 +42,10 @@ INVENTORY = [("JAVA", "java"), ("SPRING", "spring"), ("PGSQL", "postgres"), ("OR
 PERIODS = {"1": "2025 - HOJE", "2": "2023 - 2025", "3": "2022 - 2023"}
 CARTRIDGES = {"prancha": "PRANCHA KIDS", "lume": "LUME"}
 SECTIONS = {"sobre": "SOBRE MIM", "inventario": "INVENTÁRIO", "cartuchos": "CARTUCHOS", "historico": "HISTÓRICO"}
+
+LOOP = 14        # segundos por volta da cobrinha
+MAX_COLS = 12    # blocos por linha de linguagem
+MAX_SNAKE = 8    # tamanho máximo da cobrinha
 
 
 def fetch(url, accept="application/vnd.github+json", data=None):
@@ -55,18 +59,17 @@ def fetch(url, accept="application/vnd.github+json", data=None):
 
 
 def contributions():
-    """Lê o calendário público de contribuições e devolve [(data, quantidade)] em ordem."""
+    """Soma as contribuições do calendário público dos últimos 12 meses."""
     html = fetch(f"https://github.com/users/{USER}/contributions", accept="text/html")
     ids = dict(re.findall(r'data-date="(\d{4}-\d\d-\d\d)"[^>]*id="([^"]+)"', html))
     tips = dict(re.findall(r'<tool-tip[^>]*for="([^"]+)"[^>]*>([^<]+)</tool-tip>', html))
-    days = []
-    for date, cell in ids.items():
-        m = re.match(r"\s*(\d+)\s+contribution", tips.get(cell, ""))
-        days.append((datetime.date.fromisoformat(date), int(m.group(1)) if m else 0))
-    days.sort()
-    if not days:
+    if not ids:
         raise SystemExit("calendário de contribuições vazio; o formato da página pode ter mudado")
-    return days
+    total = 0
+    for cell in ids.values():
+        m = re.match(r"\s*(\d+)\s+contribution", tips.get(cell, ""))
+        total += int(m.group(1)) if m else 0
+    return total
 
 
 def languages():
@@ -138,60 +141,98 @@ class Svg:
                 f'<defs>{defs}</defs>' + "".join(self.parts) + "</svg>\n")
 
 
-def calendar_columns(days):
-    """Agrupa os dias em colunas de domingo a sábado, com nível 0 a 4 por dia."""
-    peak = max(n for _, n in days) or 1
-
-    def level(n):
-        if n == 0:
-            return 0
-        q = n / peak
-        return 1 if q <= .25 else 2 if q <= .5 else 3 if q <= .75 else 4
-
-    cols, col = [], [0] * ((days[0][0].weekday() + 1) % 7)
-    for date, n in days:
-        col.append(level(n))
-        if len(col) == 7:
-            cols.append(col)
-            col = []
-    if col:
-        cols.append(col + [0] * (7 - len(col)))
-    return cols[-53:]
-
-
 def blink(dur="1.1s"):
     return (f'<animate attributeName="opacity" values="1;0" keyTimes="0;0.5" dur="{dur}" '
             f'calcMode="discrete" repeatCount="indefinite"/>')
 
 
-def snake(svg, ncols, left, top, pitch=8, size=6, length=4, dur=14):
-    """Cobrinha em passos discretos, em zigue-zague, atravessando a grade da esquerda para a direita."""
-    def pos(i):
-        r = i % 12
-        return i * pitch, (r if r <= 6 else 12 - r) * pitch
-    clip = f"clip{left}"
-    svg.add(f'<clipPath id="{clip}"><rect x="{left}" y="{top}" width="{ncols * pitch - 2}" height="{7 * pitch - 2}"/></clipPath>')
-    svg.add(f'<g clip-path="url(#{clip})">')
-    for k in range(length):
+def visibility(intervals):
+    """<animate> discreto que deixa o elemento visível dentro dos intervalos (frações da volta) e oculto fora."""
+    intervals = [(a, b) for a, b in intervals if a < b]
+    cuts = sorted({0.0} | {t for a, b in intervals for t in (a, b) if 0 < t < 1})
+    on = lambda t: any(a <= t < b for a, b in intervals)
+    values = ";".join("1" if on(t) else "0" for t in cuts)
+    keys = ";".join(f"{t:.4f}" for t in cuts)
+    return (f'<animate attributeName="opacity" values="{values}" keyTimes="{keys}" dur="{LOOP}s" '
+            f'calcMode="discrete" repeatCount="indefinite"/>')
+
+
+def snake_screen(svg, langs, left, top, right):
+    """Uma linha por linguagem, um bloco por repositório. A cobrinha percorre as linhas em serpentina,
+    come os blocos, cresce a cada um e conta os pontos. Tudo volta ao começo no fim da volta."""
+    langs = [(name, count, min(count, MAX_COLS)) for name, count in langs[:4]]
+    ncols = max(shown for _, _, shown in langs)
+    cell, px, py, x0 = 16, 22, 28, 200
+    path = []
+    for r in range(len(langs)):
+        cols = range(ncols) if r % 2 == 0 else range(ncols - 1, -1, -1)
+        path += [(r, c) for c in cols]
+    n = len(path)
+    step = {rc: i for i, rc in enumerate(path)}
+    reset = (n - 0.5) / n
+
+    eaten = []
+    for r, (name, count, shown) in enumerate(langs):
+        y = top + r * py
+        svg.text(left, y, name.upper(), 16, LCD["ink"])
+        svg.text(right, y, str(count), 16, LCD["ink"], anchor="end")
+        for c in range(shown):
+            t = step[(r, c)] / n
+            eaten.append(t)
+            svg.add(f'<rect x="{x0 + c * px}" y="{y - 13}" width="{cell}" height="{cell}" '
+                    f'fill="{LCD["shades"][r % 4]}">{visibility([(0, t), (reset, 1)])}</rect>')
+    eaten.sort()
+    total = len(eaten)
+
+    # a cobrinha: o segmento k aparece quando o k-ésimo bloco é comido
+    for k in range(min(MAX_SNAKE, total + 1)):
         values = []
-        for i in range(ncols):
+        for i in range(n):
             j = i - k
-            x, y = pos(j) if j >= 0 else (-pitch * 2, 0)
-            values.append(f"{left + x:g} {top + y:g}")
-        key = ";".join(f"{i / ncols:.4f}" for i in range(ncols))
-        svg.add(f'<rect width="{size}" height="{size}" fill="{LCD["ink"]}" stroke="{LCD["bg"]}" stroke-width="1">'
+            if j < 0:
+                values.append("-40 0")
+            else:
+                r, c = path[j]
+                values.append(f"{x0 + c * px} {top + r * py - 13}")
+        keys = ";".join(f"{i / n:.4f}" for i in range(n))
+        grow = "" if k == 0 else visibility([(eaten[k - 1], reset)])
+        svg.add(f'<rect width="{cell}" height="{cell}" fill="{LCD["ink"]}" stroke="{LCD["bg"]}" stroke-width="1">'
                 f'<animateTransform attributeName="transform" type="translate" values="{";".join(values)}" '
-                f'keyTimes="{key}" dur="{dur}s" calcMode="discrete" repeatCount="indefinite"/></rect>')
-    svg.add("</g>")
+                f'keyTimes="{keys}" dur="{LOOP}s" calcMode="discrete" repeatCount="indefinite"/>{grow}</rect>')
+
+    # placar: COMIDOS 00/25, com um par de dígitos por valor, mostrado só no seu intervalo
+    head_y = top - 34
+    label, tail = "COMIDOS ", f"/{total}"
+    start = right - svg.measure(label + "00" + tail, 16)
+    num_x = start + svg.measure(label, 16)
+    svg.text(start, head_y, label, 16, LCD["ink"])
+    svg.text(num_x + svg.measure("00", 16), head_y, tail, 16, LCD["ink"])
+    for k in range(total + 1):
+        if k == 0:
+            spans = [(0, eaten[0]), (reset, 1)]
+        elif k == total:
+            spans = [(eaten[-1], reset)]
+        else:
+            spans = [(eaten[k - 1], eaten[k])]
+        if not any(a < b for a, b in spans):
+            continue
+        svg.add(f'<g>{visibility(spans)}')
+        svg.text(num_x, head_y, f"{k:02d}", 16, LCD["ink"])
+        svg.add("</g>")
+    return total
 
 
 def device(theme, data):
     t = THEMES[theme]
-    W, H = WIDTH, 670
-    svg = Svg(W, H, "Console portátil com os números do perfil, a cobrinha sobre o calendário e as linguagens")
+    nrows = len(data["langs"][:4])
+    lcd_h = 168 if nrows == 4 else 168 - (4 - nrows) * 28
+    bezel_h = lcd_h + 32
+    shift = 252 - bezel_h  # quanto os comandos sobem em relação ao desenho de 252 px de tela
+    W, H = WIDTH, 670 - shift
+    svg = Svg(W, H, "Console portátil: números do perfil em cima e, embaixo, uma cobrinha comendo os repositórios, uma linha por linguagem")
     # carcaça com sombra embaixo
     for dy, fill in ((6, t["edge"]), (0, t["shell"])):
-        svg.add(f'<path d="M24 {dy}H536a24 24 0 0 1 24 24V{616 + dy}a48 48 0 0 1-48 48H24a24 24 0 0 1-24-24V{24 + dy}A24 24 0 0 1 24 {dy}Z" '
+        svg.add(f'<path d="M24 {dy}H536a24 24 0 0 1 24 24V{616 - shift + dy}a48 48 0 0 1-48 48H24a24 24 0 0 1-24-24V{24 + dy}A24 24 0 0 1 24 {dy}Z" '
                 f'fill="{fill}"/>')
     svg.text(28, 40, "JPR-1 · DEV HANDHELD", 16, t["shell_ink"])
     svg.text(532, 40, "MARINGÁ · PR", 16, t["shell_ink"], anchor="end")
@@ -226,32 +267,20 @@ def device(theme, data):
 
     svg.rect(28, 258, 504, 5, t["edge"], 2)
 
-    # tela de baixo
-    svg.rect(28, 273, 504, 252, t["bezel"], 12)
-    svg.rect(44, 289, 472, 220, LCD["bg"], extra=f'stroke="{LCD["edge"]}" stroke-width="2"')
-    svg.text(64, 317, "SNAKE · 12 MESES", 16, LCD["ink"])
-    svg.text(496, 317, f"PONTOS {data['contrib']}", 16, LCD["ink"], anchor="end")
-    cols = data["cols"]
-    gx, gy = 64, 329
-    for ci, col in enumerate(cols):
-        for ri, lv in enumerate(col):
-            svg.rect(gx + ci * 8, gy + ri * 8, 6, 6, LCD["ramp"][lv])
-    snake(svg, len(cols), gx, gy)
-    svg.rect(64, 397, 432, 2, LCD["ink"])
-    for i, (name, count) in enumerate(data["langs"][:4]):
-        y = 425 + i * 22
-        svg.text(64, y, name.upper(), 16, LCD["ink"])
-        n = min(count, 14)
-        for b in range(n):
-            svg.rect(196 + b * 9, y - 12, 6, 12, LCD["ink"])
-        svg.text(196 + n * 9 + 6, y, str(count), 16, LCD["ink"])
+    # tela de baixo: a cobrinha e os repositórios
+    svg.rect(28, 273, 504, bezel_h, t["bezel"], 12)
+    svg.rect(44, 289, 472, lcd_h, LCD["bg"], extra=f'stroke="{LCD["edge"]}" stroke-width="2"')
+    svg.text(64, 317, "SNAKE · REPOS", 16, LCD["ink"])
+    snake_screen(svg, data["langs"], left=64, top=351, right=496)
 
     # comandos
-    svg.add(f'<rect x="56" y="547" width="28" height="78" rx="5" fill="{t["bezel"]}"/>')
-    svg.add(f'<rect x="31" y="572" width="78" height="28" rx="5" fill="{t["bezel"]}"/>')
+    s = -shift
+    svg.add(f'<rect x="56" y="{547 + s}" width="28" height="78" rx="5" fill="{t["bezel"]}"/>')
+    svg.add(f'<rect x="31" y="{572 + s}" width="78" height="28" rx="5" fill="{t["bezel"]}"/>')
     for cx in (262, 326):
-        svg.add(f'<rect x="{cx - 24}" y="591" width="48" height="12" rx="6" fill="{t["edge"]}" transform="rotate(-20 {cx} 597)"/>')
-    for cx, cy, label in ((418, 600, "E-MAIL"), (494, 574, "LINKEDIN")):
+        svg.add(f'<rect x="{cx - 24}" y="{591 + s}" width="48" height="12" rx="6" fill="{t["edge"]}" '
+                f'transform="rotate(-20 {cx} {597 + s})"/>')
+    for cx, cy, label in ((418, 600 + s, "E-MAIL"), (494, 574 + s, "LINKEDIN")):
         svg.add(f'<circle cx="{cx}" cy="{cy + 3}" r="22" fill="#000" opacity=".22"/>')
         svg.add(f'<circle cx="{cx}" cy="{cy}" r="22" fill="{t["btn"]}"/>')
         svg.text(cx, cy + 42, label, 16, t["shell_ink"], anchor="middle")
@@ -300,11 +329,9 @@ def badge(theme, label):
 
 
 def main():
-    days = contributions()
-    langs = languages()
     extra = totals()
-    data = {"contrib": sum(n for _, n in days), "commits": extra["commits"], "prs": extra["prs"],
-            "repos": extra["repos"], "cols": calendar_columns(days), "langs": langs}
+    data = {"contrib": contributions(), "commits": extra["commits"], "prs": extra["prs"],
+            "repos": extra["repos"], "langs": languages()}
     os.makedirs(OUT, exist_ok=True)
     for theme in THEMES:
         files = {f"device-{theme}.svg": device(theme, data), f"inventory-{theme}.svg": inventory(theme)}
@@ -318,7 +345,7 @@ def main():
             with open(os.path.join(OUT, name), "w", encoding="utf-8", newline="\n") as f:
                 f.write(content)
     print("contribuições:", data["contrib"], "| commits:", data["commits"], "| PRs:", data["prs"],
-          "| repositórios:", data["repos"], "| linguagens:", langs[:4])
+          "| repositórios:", data["repos"], "| linguagens:", data["langs"][:4])
 
 
 if __name__ == "__main__":

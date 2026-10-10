@@ -2,7 +2,7 @@
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./media/device-dark.svg">
-  <img src="./media/device-light.svg" width="560" alt="Console portátil com a tela de cima mostrando João Pedro Redondo, desenvolvedor Java e full stack, e os números de contribuições, commits, pull requests e repositórios. Na tela de baixo, uma cobrinha percorre o calendário de contribuições e as linguagens principais aparecem em blocos.">
+  <img src="./media/device-light.svg" width="560" alt="Console portátil com a tela de cima mostrando João Pedro Redondo, desenvolvedor Java e full stack, e os números de contribuições, commits, pull requests e repositórios. Na tela de baixo, uma cobrinha come os blocos que representam os repositórios, uma linha por linguagem, e cresce a cada bloco enquanto o placar sobe.">
 </picture>
 
 <a href="https://www.linkedin.com/in/joaopedroredondo/">LinkedIn</a> · <a href="mailto:joaopedroredondo@hotmail.com">joaopedroredondo@hotmail.com</a>
