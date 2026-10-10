@@ -103,8 +103,10 @@ def totals():
 
 
 class Svg:
-    def __init__(self, width, height, title):
+    def __init__(self, width, height, title, vb=None, scale=1):
         self.w, self.h, self.title = width, height, title
+        self.scale = scale  # fator do tamanho exibido; o desenho (viewBox) não muda
+        self.vb = vb or (0, 0, width, height)  # janela do desenho que aparece (x, y, largura, altura)
         self.defs = {}
         self.parts = []
 
@@ -136,8 +138,9 @@ class Svg:
 
     def render(self):
         defs = "".join(f'<path id="{k}" d="{v}"/>' for k, v in sorted(self.defs.items()))
-        return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w:g}" height="{self.h:g}" '
-                f'viewBox="0 0 {self.w:g} {self.h:g}" role="img"><title>{self.title}</title>'
+        vx, vy, vw, vh = self.vb
+        return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{self.w * self.scale:g}" height="{self.h * self.scale:g}" '
+                f'viewBox="{vx:g} {vy:g} {vw:g} {vh:g}" role="img"><title>{self.title}</title>'
                 f'<defs>{defs}</defs>' + "".join(self.parts) + "</svg>\n")
 
 
@@ -222,18 +225,73 @@ def snake_screen(svg, langs, left, top, right):
     return total
 
 
-def device(theme, data):
-    t = THEMES[theme]
-    nrows = len(data["langs"][:4])
+def layout(nrows):
+    """Medidas da tela de baixo: altura do LCD, da moldura, quanto os comandos sobem e altura total."""
     lcd_h = 168 if nrows == 4 else 168 - (4 - nrows) * 28
     bezel_h = lcd_h + 32
     shift = 252 - bezel_h  # quanto os comandos sobem em relação ao desenho de 252 px de tela
-    W, H = WIDTH, 670 - shift
-    svg = Svg(W, H, "Console portátil: números do perfil em cima e, embaixo, uma cobrinha comendo os repositórios, uma linha por linguagem")
-    # carcaça com sombra embaixo
+    return lcd_h, bezel_h, shift, 670 - shift
+
+
+def shell(svg, t, shift):
+    """Carcaça do aparelho, com sombra embaixo."""
     for dy, fill in ((6, t["edge"]), (0, t["shell"])):
         svg.add(f'<path d="M24 {dy}H536a24 24 0 0 1 24 24V{616 - shift + dy}a48 48 0 0 1-48 48H24a24 24 0 0 1-24-24V{24 + dy}A24 24 0 0 1 24 {dy}Z" '
                 f'fill="{fill}"/>')
+
+
+def controls(svg, t, s, which):
+    """Cruz, pílulas, botões redondos e grade de som. s é o deslocamento vertical da faixa de comandos."""
+    if "dpad" in which:
+        svg.add(f'<rect x="56" y="{547 + s}" width="28" height="78" rx="5" fill="{t["bezel"]}"/>')
+        svg.add(f'<rect x="31" y="{572 + s}" width="78" height="28" rx="5" fill="{t["bezel"]}"/>')
+    if "pills" in which:
+        for cx in (262, 326):
+            svg.add(f'<rect x="{cx - 24}" y="{591 + s}" width="48" height="12" rx="6" fill="{t["edge"]}" '
+                    f'transform="rotate(-20 {cx} {597 + s})"/>')
+    for key, cx, cy, label in (("email", 399, 600 + s, "E-MAIL"), ("linkedin", 494, 574 + s, "LINKEDIN")):
+        if key in which:
+            svg.add(f'<circle cx="{cx}" cy="{cy + 3}" r="22" fill="#000" opacity=".22"/>')
+            svg.add(f'<circle cx="{cx}" cy="{cy}" r="22" fill="{t["btn"]}"/>')
+            svg.text(cx, cy + 42, label, 16, t["shell_ink"], anchor="middle")
+    if "grille" in which:
+        for i in range(4):
+            x = 410 + i * 24
+            svg.add(f'<rect x="{x}" y="{545 + s}" width="8" height="60" rx="4" fill="{t["edge"]}" '
+                    f'transform="rotate(-20 {x + 4} {575 + s})"/>')
+
+
+# A base do console é cortada em quatro imagens para os botões virarem links. Os cortes ficam em
+# múltiplos de 20 px para que, no celular (escala 0,6), todas as peças tenham largura inteira.
+STRIP = {"p1": (0, 160, {"dpad"}), "p2": (160, 360, {"pills"}), "p3": (360, 440, {"email"}),
+         "p4": (440, 560, {"linkedin"})}
+MOBILE = 0.6  # escala do console no celular: 560 px viram 336 px
+
+
+def strip(theme, piece, nrows=4, scale=1):
+    """Um pedaço da faixa de baixo do console, para virar uma imagem com link."""
+    t = THEMES[theme]
+    x0, x1, which = STRIP[piece]
+    _, bezel_h, shift, H = layout(nrows)
+    top = 273 + bezel_h
+    svg = Svg(x1 - x0, H - top, "Faixa de comandos do console", vb=(x0, top, x1 - x0, H - top), scale=scale)
+    shell(svg, t, shift)
+    controls(svg, t, -shift, which)
+    return svg.render()
+
+
+def device(theme, data, buttons=True, body_only=False, scale=1):
+    t = THEMES[theme]
+    nrows = len(data["langs"][:4])
+    lcd_h, bezel_h, shift, H = layout(nrows)
+    W = WIDTH
+    title_ = "Console portátil: números do perfil em cima e, embaixo, uma cobrinha comendo os repositórios, uma linha por linguagem"
+    if body_only:
+        cut = 273 + bezel_h
+        svg = Svg(W, cut, title_, vb=(0, 0, W, cut), scale=scale)
+    else:
+        svg = Svg(W, H, title_, scale=scale)
+    shell(svg, t, shift)
     svg.text(28, 40, "JPR-1 · DEV HANDHELD", 16, t["shell_ink"])
     svg.text(532, 40, "MARINGÁ · PR", 16, t["shell_ink"], anchor="end")
 
@@ -274,16 +332,8 @@ def device(theme, data):
     snake_screen(svg, data["langs"], left=64, top=351, right=496)
 
     # comandos
-    s = -shift
-    svg.add(f'<rect x="56" y="{547 + s}" width="28" height="78" rx="5" fill="{t["bezel"]}"/>')
-    svg.add(f'<rect x="31" y="{572 + s}" width="78" height="28" rx="5" fill="{t["bezel"]}"/>')
-    for cx in (262, 326):
-        svg.add(f'<rect x="{cx - 24}" y="{591 + s}" width="48" height="12" rx="6" fill="{t["edge"]}" '
-                f'transform="rotate(-20 {cx} {597 + s})"/>')
-    for cx, cy, label in ((418, 600 + s, "E-MAIL"), (494, 574 + s, "LINKEDIN")):
-        svg.add(f'<circle cx="{cx}" cy="{cy + 3}" r="22" fill="#000" opacity=".22"/>')
-        svg.add(f'<circle cx="{cx}" cy="{cy}" r="22" fill="{t["btn"]}"/>')
-        svg.text(cx, cy + 42, label, 16, t["shell_ink"], anchor="middle")
+    which = {"dpad", "pills"} | ({"email", "linkedin"} if buttons else {"grille"})
+    controls(svg, t, -shift, which)
     return svg.render()
 
 
@@ -334,7 +384,11 @@ def main():
             "repos": extra["repos"], "langs": languages()}
     os.makedirs(OUT, exist_ok=True)
     for theme in THEMES:
-        files = {f"device-{theme}.svg": device(theme, data), f"inventory-{theme}.svg": inventory(theme)}
+        files = {f"inventory-{theme}.svg": inventory(theme)}
+        for suffix, scale in (("", 1), ("-m", MOBILE)):
+            files[f"console-{theme}{suffix}.svg"] = device(theme, data, body_only=True, scale=scale)
+            for piece in STRIP:
+                files[f"{piece}-{theme}{suffix}.svg"] = strip(theme, piece, len(data["langs"][:4]), scale)
         for key, label in SECTIONS.items():
             files[f"h-{key}-{theme}.svg"] = title(theme, label)
         for key, label in CARTRIDGES.items():
