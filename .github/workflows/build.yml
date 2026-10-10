@@ -1,0 +1,32 @@
+name: Atualiza o README
+
+on:
+  schedule:
+    - cron: "17 9 * * 1" # toda segunda, 06h17 em Brasília
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Gera os SVGs
+        run: python3 scripts/build.py
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publica se houve mudança
+        run: |
+          if [ -z "$(git status --porcelain media)" ]; then
+            echo "Sem mudanças."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add media
+          git commit -m "Atualiza os gráficos do README"
+          git push
